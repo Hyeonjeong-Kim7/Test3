@@ -1,6 +1,12 @@
 from urllib.parse import urlparse
 import re
 import streamlit as st
+import numpy as np
+import joblib
+
+# scaler와 model을 미리 불러옵니다 (경로는 환경에 맞게 수정)
+scaler = joblib.load('scaler.pkl')
+model = joblib.load('model.pkl')
 
 def extract_features_from_url(url):
     parsed = urlparse(url)
@@ -36,31 +42,30 @@ def extract_features_from_url(url):
         num_numeric
     ]
 
-
-# Streamlit UI 구성
+# Streamlit UI
 st.title("🔍 Phishing URL Detection App")
 st.markdown("Enter a URL below to check if it is a phishing attempt.")
 
-# URL 입력창
 url_input = st.text_input("Enter a URL:")
 
-# Predict 버튼 클릭 시 동작
 if st.button("Predict"):
     if url_input:
-        # URL feature 추출
-        features = extract_features_from_url(url_input)
-        X_input = np.array(features).reshape(1, -1)
-        X_scaled = scaler.transform(X_input)
-        
-        # 모델 예측
-        prediction = model.predict(X_scaled)[0]
-        probability = model.predict_proba(X_scaled)[0].tolist()
-        
-        # 결과 표시
-        result_text = "✅ Legitimate URL" if prediction == 0 else "⚠️ Phishing URL!"
-        
-        st.markdown(f"## Result: {result_text}")
-        st.write(f"Probability: {probability}")
-        st.write(f"Extracted Features: {features}")
+        try:
+            # URL feature 추출
+            features = extract_features_from_url(url_input)
+            X_input = np.array(features).reshape(1, -1)
+            X_scaled = scaler.transform(X_input)
+            
+            # 모델 예측
+            prediction = model.predict(X_scaled)[0]
+            probability = model.predict_proba(X_scaled)[0].tolist()
+            
+            # 결과 표시
+            result_text = "✅ Legitimate URL" if prediction == 0 else "⚠️ Phishing URL!"
+            st.markdown(f"## Result: {result_text}")
+            st.write(f"Probability: {probability}")
+            st.write(f"Extracted Features: {features}")
+        except Exception as e:
+            st.error(f"An error occurred during prediction: {e}")
     else:
         st.warning("Please enter a URL.")
