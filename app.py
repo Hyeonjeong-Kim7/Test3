@@ -6,7 +6,7 @@ import joblib
 
 # scaler와 model을 미리 불러옵니다 (경로는 환경에 맞게 수정)
 scaler = joblib.load('scaler.pkl')
-model = joblib.load('xgb_phishing_model.pkl.pkl')
+model = joblib.load('xgb_phishing_model.pkl')
 
 def extract_features_from_url(url):
     parsed = urlparse(url)
