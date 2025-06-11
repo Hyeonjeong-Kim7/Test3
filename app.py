@@ -1,5 +1,6 @@
 from urllib.parse import urlparse
 import re
+import streamlit as st
 
 def extract_features_from_url(url):
     parsed = urlparse(url)
